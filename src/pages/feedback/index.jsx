@@ -25,7 +25,7 @@ const FeedbackPage = () => {
                     }}
                     className="text-4xl md:text-5xl align-center font-extrabold text-center uppercase "
                 >
-                    Đánh giá khách hàng
+                    đánh giá dịch vụ
                 </motion.h1>
                 <div className="flex flex-col items-center my-5">
                     <motion.span
@@ -71,7 +71,7 @@ const FeedbackPage = () => {
                         <label className="block text-sm font-medium mb-1" htmlFor="message">Lời đánh giá</label>
                         <textarea id="message" rows="5"
                                   name='message'
-                                  className="w-full border border-black rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-black  border-solid bg-feedback_color placeholder-gray-700  "
+                                  className="w-full border border-black block text-sm font-semibold rounded-lg px-4 py-2  focus:outline-none focus:ring-1 focus:ring-black  border-solid bg-feedback_color placeholder-gray-700"
                                   placeholder="Vui lòng điền đánh giá của bạn"></textarea>
                     </motion.div>
 
@@ -92,7 +92,7 @@ const FeedbackPage = () => {
                     </motion.div>
                 </form>
             </div>
-            <div className="relative w-[100%] lg:w-[80%] md:w-[95%] h-12 overflow-hidden my-12">
+            <div className="relative w-[100%] lg:w-[80%] md:w-[95%] h-12 overflow-hidden lg:mt-12 mt-8">
                 <motion.div
                     className="absolute top-0 left-0 flex"
                     initial={{ x: '-50%' }}

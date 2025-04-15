@@ -1,7 +1,7 @@
 {
   "name": "web-app-qrcode",
+  "homepage": "https://fe.shoedog.vn",
   "private": true,
-  "homepage": "https://19127526.github.io/QR-CODE/",
   "version": "0.0.0",
   "type": "module",
   "scripts": {

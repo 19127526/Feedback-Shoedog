@@ -23,9 +23,7 @@
     transition: transform 0.3s;
     cursor: pointer;
 }
-.feedback label:not(:last-child) {
-    margin-right: 20px;
-}
+
 .feedback label input {
     -webkit-appearance: none;
     -moz-appearance: none;
