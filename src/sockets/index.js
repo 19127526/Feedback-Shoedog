@@ -1,43 +1,40 @@
-import { useState, useEffect } from 'react';
-import {io} from "socket.io-client";
+// socketClient.js (hoặc .ts nếu dùng TypeScript)
+import { io } from "socket.io-client";
+import { encryptString } from '@/utils/help.js';
 
-const SocketClient = () => {
-    const [socketClient, setSocketClient] = useState();
-    // Socket Payment
-    const setUpSocketConnection = () => {
+export let socketInstance = null;
 
-        let params = {
-            query: {
-                // clientType: 'WEBAPP',
-                // manufacturerId: userInfo?.manufacturer_id,
-                // memberId: userInfo?.member_id,
-                // macAddress: macAddress,
-            },
-            timeout: 30000,
-            reconnection:  false,
-            forceNew: true,
-            reconnectionAttempts:3,
-            reconnectionDelay: 1000,
-            reconnectionDelayMax: 5000,
-            randomizationFactor: 0.5,
-            transports: ['websocket'],
-        };
-        const socketIo = io('http://localhost:3000', params);
-        setSocketClient(socketIo);
+const setUpSocketConnection = () => {
+    if (socketInstance) return socketInstance;
+
+    console.log('dmmmmmmmmmmmmmmmm')
+    const params = {
+        query: {
+            code: encryptString(JSON.stringify({ status: 1994 }))
+        },
+        timeout: 30000,
+        reconnection: false,
+        forceNew: true,
+        reconnectionAttempts: 3,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        randomizationFactor: 0.5,
+        transports: ['websocket'],
     };
 
-    useEffect(() => {
-        if (socketClient) {
-            socketClient.on('reconnect_attempt', (data) => {
-                console.log('reconnect_attempt data', data);
-            });
-        }
-    }, [socketClient]);
-
-    return {
-        socketClient,
-        setUpSocketConnection,
-    };
+    socketInstance = io('http://localhost:3000', params);
+    return socketInstance;
 };
 
-export { SocketClient };
+const getSocketClient = () => {
+    return socketInstance;
+};
+
+const disconnectSocket = () => {
+    if (socketInstance) {
+        socketInstance.disconnect();
+        socketInstance = null;
+    }
+};
+
+export { setUpSocketConnection, getSocketClient, disconnectSocket };

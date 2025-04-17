@@ -1,19 +1,26 @@
 import RoutesPage from './routes/RoutePage.jsx'
 import { motion } from 'framer-motion'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import {  useLocation, useNavigate } from 'react-router-dom'
+import { useContext, useEffect, useRef, useState } from 'react'
 import HeaderImg from '/images/header-img.png'
-import { SocketClient } from './sockets/index.js'
-
+import { disconnectSocket, getSocketClient, setUpSocketConnection } from './sockets/index.js'
+import { EVENT_RECEIVE } from '@/constant/common.const.js'
+import { notification } from 'antd'
+import { MyContext } from '@/main.jsx'
 
 
 function App() {
     const location = useLocation()
     const [key, setKey] = useState(0)
+    const { data:billInfo, setData: setBillInfo } = useContext(MyContext);
+    const billInfoTmp = useRef(billInfo)
+    const socketClient = getSocketClient()
     const navigate = useNavigate()
 
-    const { socketClient, setUpSocketConnection } = SocketClient()
 
+    useEffect(() => {
+        billInfoTmp.current = billInfo
+    }, [billInfo])
     useEffect(() => {
         if (!socketClient) {
             setUpSocketConnection()
@@ -21,6 +28,89 @@ function App() {
             socketClient?.connect()
         }
     }, [])
+
+    useEffect(() => {
+        if (!socketClient) {
+            return;
+        }
+
+        const onReceivedResultConnect = (body) => {
+            if(!(body && body?.result === 0)) {
+                notification.error({
+                    message: body?.message,
+                    placement: 'topRight'
+                })
+            }
+            // if (interactive) {
+            //     try {
+            //         const manufacturerId = cookies.get(SESSION_KEY?.MANUFACTURER_ID);
+            //         // lang nghe event tu Server
+            //         socketClient.emit(
+            //             'userStartInteractive',
+            //             {
+            //                 interactive: interactive?.interactive,
+            //                 member_id: user?.member_id,
+            //             },
+            //             (data) => {},
+            //         );
+            //     } catch (err) {}
+            // }
+        }
+
+        const onReceivedResultSendFeedback = (body) => {
+            if (body && body?.result != null) {
+                if(body?.result === 0) {
+                    if(location.pathname !== '/') {
+                        navigate('/')
+                    }
+                    if(!billInfoTmp.current) {
+                        billInfoTmp.current = body.data
+                        setBillInfo(body.data)
+                    } else if(billInfoTmp.current?.id === body.data?.id) {
+                        return;
+                    } else {
+                        setBillInfo(body.data)
+                        navigate('/')
+                    }
+                }
+                notification[body?.result === 0 ? 'info' : 'error']({
+                    message: body?.message,
+                    placement: 'topRight'
+                })
+            }
+        }
+
+        const onReceivedResultSendSubmitFeedback = (body) => {
+            if (body && body?.result != null) {
+                if(body?.result === 0) {
+                    navigate('/success', {
+                        state: {
+                            data: body?.data
+                        }
+                    })
+                    return;
+                }
+            }
+            notification.error({
+                message: body?.message,
+                placement: 'topRight'
+            })
+        }
+
+
+
+        socketClient.on(EVENT_RECEIVE.RESULT_CONNECT, onReceivedResultConnect)
+        socketClient.on(EVENT_RECEIVE.RESULT_EVENT_SEND_FEEDBACK, onReceivedResultSendFeedback)
+        socketClient.on(EVENT_RECEIVE.RESULT_EVENT_SEND_SUBMIT_FEEDBACK, onReceivedResultSendSubmitFeedback)
+        return (() => {
+            disconnectSocket()
+            billInfoTmp.current= null;
+            socketClient.off(EVENT_RECEIVE.RESULT_CONNECT, onReceivedResultConnect)
+            socketClient.off(EVENT_RECEIVE.RESULT_EVENT_SEND_FEEDBACK, onReceivedResultSendFeedback)
+            socketClient.off(EVENT_RECEIVE.RESULT_EVENT_SEND_SUBMIT_FEEDBACK, onReceivedResultSendSubmitFeedback)
+        })
+    }, [socketClient])
+
 
     useEffect(() => {
         setKey(prev => prev + 1) // Trigger remount on route change
@@ -51,8 +141,9 @@ function App() {
                 </motion.div>
             </div>
             <RoutesPage />
+
         </div>
-    )
+)
 }
 
 export default App

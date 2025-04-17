@@ -1,12 +1,23 @@
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import ButtonDetailComponent from '@/components/button-detail/index.jsx'
+import { DoubleRightOutlined, PicRightOutlined } from '@ant-design/icons'
+import { MyContext } from '@/main.jsx'
 
 const SuccessPage = () => {
     const navigate = useNavigate()
     const [size, setSize] = useState({
         width: window.innerWidth,
         height: window.innerHeight
+    })
+    const location  = useLocation()
+    const { data: billInfo, setData: serBillInfo } = useContext(MyContext);
+    const billInfoNext = location.state?.data || null;
+    const [countdown, setCountdown] = useState({
+        isShow: !!billInfoNext,
+        count: 5
     })
 
     useEffect(() => {
@@ -26,11 +37,32 @@ const SuccessPage = () => {
         return () => window.removeEventListener('resize', handleResize)
     }, [])
 
-    console.log('size', size)
+    useEffect(() => {
+        if(countdown.isShow)  {
+            const interval = setInterval(() => {
+                setCountdown((prev) => ({
+                    isShow: prev.isShow,
+                    count: prev.count -1
+                }))
+            }, 1000)
+
+            const timeout = setTimeout(() => {
+                serBillInfo(billInfoNext)
+                navigate('/')
+            }, 5000)
+
+            return () => {
+                clearInterval(interval)
+                clearTimeout(timeout)
+            }
+        }
+    }, [])
+
     return (
         <>
             {/* Nội dung chính */}
             <div className={`flex justify-center items-center h-[${size.height}px] overflow-hidden`}>
+                <p className="text-gray-500 mt-4">Chuyển về trang chủ sau {countdown.count} giây...</p>
                 <motion.div
                     animate={{ y: ['100%', '0%', '-100%'] }}
                     transition={{
@@ -44,6 +76,18 @@ const SuccessPage = () => {
                     <p>Chúc bạn một ngày vui vẻ</p>
                 </motion.div>
             </div>
+            {
+                countdown.isShow === true ?
+                    (
+                        <ButtonDetailComponent icon={
+                            <div className='py-4'>
+                            <span className="text-gray-500 mt-4">Về trang chủ sau {countdown.count} giây</span>
+                        </div>
+                        } />
+                    )
+                    :
+                    <></>
+            }
         </>
     )
 }
