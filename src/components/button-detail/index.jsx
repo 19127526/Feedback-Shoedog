@@ -2,9 +2,9 @@ import './index.css'
 import { PicRightOutlined } from '@ant-design/icons'
 
 const ButtonDetailComponent = (props) => {
-    const {icon = null} = props
+    const {icon = null, onClick = null} = props
     return (
-        <button className='btn-detail fixed bottom-6 right-10 z-50 py-2 px-3 rounded-[70%]  '>
+        <button className='btn-detail fixed bottom-6 right-10 z-50 py-2 px-3 rounded-[70%]  ' onClick={onClick}>
             {icon}
             <div className="star-1">
                 <svg

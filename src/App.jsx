@@ -60,16 +60,20 @@ function App() {
         const onReceivedResultSendFeedback = (body) => {
             if (body && body?.result != null) {
                 if(body?.result === 0) {
+                    const bodyTmp = {
+                        ...body.data,
+                        note: JSON.parse(body.data?.note)
+                    }
                     if(location.pathname !== '/') {
                         navigate('/')
                     }
                     if(!billInfoTmp.current) {
-                        billInfoTmp.current = body.data
-                        setBillInfo(body.data)
-                    } else if(billInfoTmp.current?.id === body.data?.id) {
+                        billInfoTmp.current = bodyTmp
+                        setBillInfo(bodyTmp)
+                    } else if(billInfoTmp.current?.id === bodyTmp?.id) {
                         return;
                     } else {
-                        setBillInfo(body.data)
+                        setBillInfo(bodyTmp)
                         navigate('/')
                     }
                 }
@@ -83,9 +87,16 @@ function App() {
         const onReceivedResultSendSubmitFeedback = (body) => {
             if (body && body?.result != null) {
                 if(body?.result === 0) {
+                    let bodyTmp = null
+                    if(body?.data) {
+                         bodyTmp = {
+                            ...body.data,
+                            note: JSON.parse(body.data?.note)
+                        }
+                    }
                     navigate('/success', {
                         state: {
-                            data: body?.data
+                            data: bodyTmp
                         }
                     })
                     return;
@@ -115,6 +126,7 @@ function App() {
     useEffect(() => {
         setKey(prev => prev + 1) // Trigger remount on route change
     }, [location.pathname])
+
     return (
         <div
             className={`max-h-screen h-screen flex flex-col  bg-center ${location.pathname === '/success' ? 'bg-feedback_img bg-cover' : 'bg-feedback_color'} `}>

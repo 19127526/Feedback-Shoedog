@@ -7,7 +7,6 @@ export let socketInstance = null;
 const setUpSocketConnection = () => {
     if (socketInstance) return socketInstance;
 
-    console.log('dmmmmmmmmmmmmmmmm')
     const params = {
         query: {
             code: encryptString(JSON.stringify({ status: 1994 }))
@@ -22,7 +21,8 @@ const setUpSocketConnection = () => {
         transports: ['websocket'],
     };
 
-    socketInstance = io('http://localhost:3000', params);
+    /*https://sv.shoedog.vn*/
+    socketInstance = io('https://sv.shoedog.vn', params);
     return socketInstance;
 };
 

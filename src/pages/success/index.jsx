@@ -13,7 +13,7 @@ const SuccessPage = () => {
         height: window.innerHeight
     })
     const location  = useLocation()
-    const { data: billInfo, setData: serBillInfo } = useContext(MyContext);
+    const { data: billInfo, setData: setBillInfo } = useContext(MyContext);
     const billInfoNext = location.state?.data || null;
     const [countdown, setCountdown] = useState({
         isShow: !!billInfoNext,
@@ -47,7 +47,7 @@ const SuccessPage = () => {
             }, 1000)
 
             const timeout = setTimeout(() => {
-                serBillInfo(billInfoNext)
+                setBillInfo(billInfoNext)
                 navigate('/')
             }, 5000)
 
@@ -79,7 +79,12 @@ const SuccessPage = () => {
             {
                 countdown.isShow === true ?
                     (
-                        <ButtonDetailComponent icon={
+                        <ButtonDetailComponent
+                            onClick={() => {
+                                setBillInfo(billInfoNext)
+                                navigate('/')
+                            }}
+                            icon={
                             <div className='py-4'>
                             <span className="text-gray-500 mt-4">Về trang chủ sau {countdown.count} giây</span>
                         </div>
